@@ -38,7 +38,7 @@ function showCurlError($ch) {
 }
 
 function initReport() {
-  return array('successful' => 0, 'failed' => 0, 'skipped' => 0);
+  return array('successful' => 0, 'failed' => 0);
 }
 
 function getAttachments($ch, $project, $url, $savepath) {
@@ -66,18 +66,19 @@ function getAttachments($ch, $project, $url, $savepath) {
     
     $file_dest = $dir_path . '/' . $attachment['name'];
 
-    if (!file_exists($file_dest)) {
-      $success = curlRequest($ch, $attachment['download-url']);
-      if ($success) {
-        file_put_contents($file_dest, $success);
-        $report['successful']++;
-      } else {
-        sendMessage("Failed to retrieve " . $attachment['name']);
-        $report['failed']++;
-      }
+    if (file_exists($file_dest)) {
+      // We'll change the filename so we can save dupes. Just append a timestamp before the extension
+      $pathinfo = pathinfo($file_dest);
+      $file_dest = $dir_path . '/' . $pathinfo['filename'] . '-' . time() . '.' . $pathinfo['extension'];
+    }
+
+    $success = curlRequest($ch, $attachment['download-url']);
+    if ($success) {
+      file_put_contents($file_dest, $success);
+      $report['successful']++;
     } else {
-      sendMessage("Skipping " . $attachment['name'] . " > File already exists");
-      $report['skipped']++; 
+      sendMessage("Failed to retrieve " . $attachment['name']);
+      $report['failed']++;
     }
   
   }

@@ -2,6 +2,8 @@ A simple script for downloading your Basecamp attachments en masse.
 
 NOTE: This isn't clean, nice code. It was written quickly to perform a single job - backup the attachments. 
 
+NOTE: Duplicate files will get a timestamp appended to the filename - ie, file-timestamp.ext
+
 USAGE: 
 
 Update 'api_paths.inc' with your basecamp site - ie, if your basecamp uri was "http://mycoolsite.basecamphq.com" then $site = "mycoolsite"
