@@ -1,0 +1,10 @@
+A simple script for downloading your Basecamp attachments en masse.
+
+NOTE: This isn't clean, nice code. It was written quickly to perform a single job - backup the attachments. 
+
+USAGE: 
+
+Update 'api_paths.inc' with your basecamp site - ie, if your basecamp uri was "http://mycoolsite.basecamphq.com" then $site = "mycoolsite"
+
+$php filesGetter.php basecampApiToken /Path/To/BackupDirectory "Project Name" (Optional, will get all projects if ommitted)
+
