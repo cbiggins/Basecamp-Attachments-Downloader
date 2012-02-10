@@ -41,10 +41,14 @@ function initReport() {
   return array('successful' => 0, 'failed' => 0);
 }
 
-function getAttachments($ch, $project, $url, $savepath) {
-  $url = str_replace('{project_id}', $project['id'], $url);
+function getAttachments($ch, $project, $url, $savepath, $report, $offset = 0) {
 
-  $result = curlRequest($ch, $url);
+  $att_url = str_replace('{project_id}', $project['id'], $url);
+  if ($offset > 0) {
+    $att_url .= '?n='.$offset;
+  }
+
+  $result = curlRequest($ch, $att_url);
 
   if (!$result) {
     showCurlError($ch);
@@ -61,6 +65,8 @@ function getAttachments($ch, $project, $url, $savepath) {
   }
 
   sendMessage("Processing " . $project['name']);  
+
+  $row_count = 0;
 
   foreach($attachArray['attachment'] as $attachment) {
     
@@ -81,6 +87,13 @@ function getAttachments($ch, $project, $url, $savepath) {
       $report['failed']++;
     }
   
+    $row_count++;
+  }
+
+  if ($row_count == 100) {
+    $offset = $offset + $row_count;
+    var_dump($offset);
+    getAttachments($ch, $project, $url, $savepath, $report, $offset);
   }
 
   sendReport($report);
