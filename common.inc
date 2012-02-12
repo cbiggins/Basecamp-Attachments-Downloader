@@ -64,23 +64,31 @@ function getAttachments($ch, $project, $url, $savepath, $report, $offset = 0) {
     mkdir($dir_path, 0755, TRUE);
   }
 
-  sendMessage("Processing " . $project['name']);  
+  if ($offset == 0) {
+    sendMessage("Processing " . $project['name']);  
+  }
 
   $row_count = 0;
+
+  $html = '';
 
   foreach($attachArray['attachment'] as $attachment) {
     
     $file_dest = $dir_path . '/' . $attachment['name'];
 
+    $filename = $attachment['name'];
+
     if (file_exists($file_dest)) {
       // We'll change the filename so we can save dupes. Just append a timestamp before the extension
       $pathinfo = pathinfo($file_dest);
-      $file_dest = $dir_path . '/' . $pathinfo['filename'] . '-' . time() . '.' . $pathinfo['extension'];
+      $filename = $pathinfo['filename'] . '-' . time() . '.' . $pathinfo['extension']; 
+      $file_dest = $dir_path . '/' . $filename;
     }
 
     $success = curlRequest($ch, $attachment['download-url']);
     if ($success) {
       file_put_contents($file_dest, $success);
+      $html .= '<a href="'.$filename.'">'.$filename.'</a><br />';
       $report['successful']++;
     } else {
       sendMessage("Failed to retrieve " . $attachment['name']);
@@ -92,11 +100,12 @@ function getAttachments($ch, $project, $url, $savepath, $report, $offset = 0) {
 
   if ($row_count == 100) {
     $offset = $offset + $row_count;
-    var_dump($offset);
     getAttachments($ch, $project, $url, $savepath, $report, $offset);
   }
-
-  sendReport($report);
+  else {
+    file_put_contents($dir_path . '/index.html', $html, FILE_APPEND);
+    sendReport($report);
+  }
 }
 
 

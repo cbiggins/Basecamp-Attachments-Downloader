@@ -49,6 +49,7 @@ $resultsArray = xmlstr_to_array($result);
 $url = $root_path . $attachments_list_path;
 $report = initReport(); 
 
+$html = '';
 foreach ($resultsArray['project'] as $projectArray) {
   
   // Do we need to look out for a specific project?
@@ -56,12 +57,15 @@ foreach ($resultsArray['project'] as $projectArray) {
     if ($projectArray['name'] == $project) {
       // Process ... 
       getAttachments($ch, $projectArray, $url, $savepath, $report);
+      $html .= '<a href="'.$projectArray['name'].'">'.$projectArray['name'].'</a><br />';
       break;
 
     }
   } else {
     getAttachments($ch, $projectArray, $url, $savepath, $report);
+    $html .= '<a href="'.$projectArray['name'].'">'.$projectArray['name'].'</a><br />';
   }
-
 }
+
+file_put_contents($savepath . '/index.html', $html, FILE_APPEND);
 
